@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
+// Base path for GitHub Pages deployment
+const basePath = process.env.NODE_ENV === 'production' ? '/zedo-world' : '';
+
 // Portfolio Data
 const portfolioData = {
   biodata: {
@@ -45,10 +48,10 @@ const dirRow: Record<string, number> = {
 // Row 1: BIO | EXP
 // Row 2: PRO | CON
 const buildings = [
-  { id: 'biodata', x: 200, y: 50, w: 150, h: 140, label: 'PROFILE', img: '/building2.png' },
-  { id: 'experience', x: 610, y: 50, w: 150, h: 140, label: 'EXPERIENCE', img: '/building3.png' },
-  { id: 'projects', x: 200, y: 410, w: 150, h: 150, label: 'PROJECTS', img: '/building4.png' },
-  { id: 'contact', x: 610, y: 410, w: 150, h: 140, label: 'CONTACT', img: '/building1.png' }
+  { id: 'biodata', x: 200, y: 50, w: 150, h: 140, label: 'PROFILE', img: `${basePath}/building2.png` },
+  { id: 'experience', x: 610, y: 50, w: 150, h: 140, label: 'EXPERIENCE', img: `${basePath}/building3.png` },
+  { id: 'projects', x: 200, y: 410, w: 150, h: 150, label: 'PROJECTS', img: `${basePath}/building4.png` },
+  { id: 'contact', x: 610, y: 410, w: 150, h: 140, label: 'CONTACT', img: `${basePath}/building1.png` }
 ];
 
 
@@ -197,7 +200,7 @@ export default function Home() {
             style={{
               width: SPRITE.w * SPRITE.cols * SPRITE.scale,
               height: SPRITE.h * SPRITE.rows * SPRITE.scale,
-              backgroundImage: 'url(/character.png)',
+              backgroundImage: `url(${basePath}/character.png)`,
               backgroundSize: '100% 100%',
               transform: `translate(${-offsetX}px, ${-offsetY}px)`,
             }}
@@ -269,7 +272,7 @@ function Experience() {
           <p className="meta">{e.company} • {e.period}</p>
         </div>
       ))}
-      <a href="/CV_Zaki_Elyasa_Djauhari_-_Software_Engineer.pdf" download className="download-cv-btn">
+      <a href={`${basePath}/CV_Zaki_Elyasa_Djauhari_-_Software_Engineer.pdf`} download className="download-cv-btn">
         📄 Download CV
       </a>
     </>
