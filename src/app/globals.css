@@ -494,3 +494,130 @@ body {
   transform: translateY(2px);
   box-shadow: 0 2px 0 #2858a8;
 }
+
+/* ==================== */
+/* RESPONSIVE SCALING */
+/* ==================== */
+
+/* Tablet landscape and smaller desktops */
+@media (max-width: 1024px) {
+  .game-world {
+    transform: scale(0.7);
+    transform-origin: center center;
+    margin: -50px 0;
+  }
+
+  .game-title {
+    font-size: 14px;
+  }
+
+  .instructions {
+    font-size: 8px;
+    padding: 10px 16px;
+  }
+}
+
+/* Tablet portrait */
+@media (max-width: 768px) {
+  .game-world {
+    transform: scale(0.5);
+    margin: -90px 0;
+  }
+
+  .game-title {
+    font-size: 12px;
+    top: 8px;
+  }
+
+  .instructions {
+    font-size: 7px;
+    padding: 8px 14px;
+    bottom: 8px;
+  }
+
+  .asset-credits {
+    font-size: 6px;
+    bottom: 8px;
+    right: 12px;
+  }
+
+  .modal-box {
+    max-width: 95%;
+    max-height: 80vh;
+  }
+
+  .modal-body {
+    font-size: 7px;
+    padding: 12px;
+  }
+
+  .modal-head span {
+    font-size: 10px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .game-world {
+    transform: scale(0.35);
+    margin: -120px 0;
+  }
+
+  .game-title {
+    font-size: 10px;
+    top: 6px;
+  }
+
+  .instructions {
+    font-size: 6px;
+    padding: 6px 12px;
+    bottom: 6px;
+  }
+
+  .asset-credits {
+    font-size: 5px;
+    bottom: 6px;
+    right: 8px;
+  }
+
+  .modal-box {
+    max-width: 98%;
+    max-height: 85vh;
+  }
+
+  .modal-body {
+    font-size: 6px;
+    padding: 10px;
+    line-height: 1.8;
+  }
+
+  .modal-head {
+    padding: 10px 12px;
+  }
+
+  .modal-head span {
+    font-size: 9px;
+  }
+
+  .modal-head button {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .profile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .tag {
+    font-size: 6px;
+    padding: 3px 6px;
+  }
+
+  .download-cv-btn {
+    font-size: 8px;
+    padding: 10px 14px;
+  }
+}

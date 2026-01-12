@@ -65,6 +65,7 @@ export default function Home() {
   const [frame, setFrame] = useState(0);
   const [modal, setModal] = useState<string | null>(null);
   const [keys, setKeys] = useState<Set<string>>(new Set());
+  const [targetPos, setTargetPos] = useState<{ x: number; y: number } | null>(null);
 
   const CW = SPRITE.w * SPRITE.scale;
   const CH = SPRITE.h * SPRITE.scale;
@@ -109,13 +110,14 @@ export default function Home() {
     return null;
   }, [CW, CH]);
 
-  // Input
+  // Keyboard Input
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
       if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter', ' '].includes(k)) {
         e.preventDefault();
         setKeys(p => new Set(p).add(k));
+        setTargetPos(null); // Cancel mouse movement when keyboard is used
       }
       if ((k === 'enter' || k === ' ') && !modal) {
         const n = nearDoor(pos.x, pos.y);
@@ -129,6 +131,21 @@ export default function Home() {
     return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
   }, [modal, pos, nearDoor]);
 
+  // Mouse click handler
+  const handleWorldClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (modal) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    // Calculate the scale factor applied by CSS transform
+    const scale = rect.width / WORLD_W;
+    // Adjust click coordinates based on scale
+    const clickX = (e.clientX - rect.left) / scale - CW / 2;
+    const clickY = (e.clientY - rect.top) / scale - CH / 2;
+    // Clamp to world bounds
+    const targetX = Math.max(0, Math.min(WORLD_W - CW, clickX));
+    const targetY = Math.max(0, Math.min(WORLD_H - CH, clickY));
+    setTargetPos({ x: targetX, y: targetY });
+  }, [modal, CW, CH]);
+
   // Game loop
   useEffect(() => {
     if (modal) return;
@@ -136,10 +153,48 @@ export default function Home() {
       setPos(p => {
         let nx = p.x, ny = p.y, moved = false, nd: Dir = dir;
 
-        if ((keys.has('a') || keys.has('arrowleft')) && !collides(p.x - SPEED, p.y)) { nx -= SPEED; nd = 'left'; moved = true; }
-        if ((keys.has('d') || keys.has('arrowright')) && !collides(p.x + SPEED, p.y)) { nx += SPEED; nd = 'right'; moved = true; }
-        if ((keys.has('w') || keys.has('arrowup')) && !collides(nx, p.y - SPEED)) { ny -= SPEED; nd = 'up'; moved = true; }
-        if ((keys.has('s') || keys.has('arrowdown')) && !collides(nx, p.y + SPEED)) { ny += SPEED; nd = 'down'; moved = true; }
+        // Keyboard movement (priority)
+        const keyMoving = keys.has('a') || keys.has('arrowleft') || keys.has('d') || keys.has('arrowright') ||
+          keys.has('w') || keys.has('arrowup') || keys.has('s') || keys.has('arrowdown');
+
+        if (keyMoving) {
+          if ((keys.has('a') || keys.has('arrowleft')) && !collides(p.x - SPEED, p.y)) { nx -= SPEED; nd = 'left'; moved = true; }
+          if ((keys.has('d') || keys.has('arrowright')) && !collides(p.x + SPEED, p.y)) { nx += SPEED; nd = 'right'; moved = true; }
+          if ((keys.has('w') || keys.has('arrowup')) && !collides(nx, p.y - SPEED)) { ny -= SPEED; nd = 'up'; moved = true; }
+          if ((keys.has('s') || keys.has('arrowdown')) && !collides(nx, p.y + SPEED)) { ny += SPEED; nd = 'down'; moved = true; }
+        }
+        // Mouse click movement
+        else if (targetPos) {
+          const dx = targetPos.x - p.x;
+          const dy = targetPos.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist > SPEED) {
+            const moveX = (dx / dist) * SPEED;
+            const moveY = (dy / dist) * SPEED;
+            const newX = p.x + moveX;
+            const newY = p.y + moveY;
+
+            // Try to move, handle collisions
+            if (!collides(newX, p.y)) { nx = newX; moved = true; }
+            if (!collides(nx, newY)) { ny = newY; moved = true; }
+
+            // Determine direction based on movement
+            if (Math.abs(dx) > Math.abs(dy)) {
+              nd = dx > 0 ? 'right' : 'left';
+            } else {
+              nd = dy > 0 ? 'down' : 'up';
+            }
+
+            // Stop if stuck (collision blocking path)
+            if (!moved) {
+              setTargetPos(null);
+            }
+          } else {
+            // Reached target
+            setTargetPos(null);
+          }
+        }
 
         nx = Math.max(0, Math.min(WORLD_W - CW, nx));
         ny = Math.max(0, Math.min(WORLD_H - CH, ny));
@@ -149,7 +204,7 @@ export default function Home() {
       });
     }, 16);
     return () => clearInterval(loop);
-  }, [keys, modal, collides, dir, CW, CH]);
+  }, [keys, modal, collides, dir, CW, CH, targetPos]);
 
   const near = nearDoor(pos.x, pos.y);
 
@@ -162,7 +217,7 @@ export default function Home() {
     <div className="game-container">
       <h1 className="game-title">★ ZEDO'S WORLD ★</h1>
 
-      <div className="game-world">
+      <div className="game-world" onClick={handleWorldClick} style={{ cursor: 'pointer' }}>
         {/* Grass background */}
         <div className="grass-layer" />
 
@@ -217,6 +272,8 @@ export default function Home() {
       {/* Asset Credits */}
       <div className="asset-credits">
         Assets by <a href="https://scarloxy.itch.io/mpwsp01" target="_blank" rel="noopener noreferrer">scarloxy</a>
+        {' | '}
+        <a href="https://www.instagram.com/scarloxy/" target="_blank" rel="noopener noreferrer" style={{ fontSize: '14px' }}>📷</a>
       </div>
     </div>
   );
