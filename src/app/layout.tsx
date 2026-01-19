@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Portfolio Game | Interactive 2D Portfolio",
-  description: "Explore my portfolio in a Pokemon-style 2D game world! Navigate through buildings to discover my biodata, experience, projects, and contact information.",
-  keywords: ["portfolio", "game", "developer", "interactive", "2D"],
+  title: "Zaki's Portfolio",
+  description: "Hi I'm Zaki, software engineer from Indonesia",
+  keywords: ["portfolio", "game", "developer", "software engineer", "interactive", "2D"],
 };
 
 export default function RootLayout({
